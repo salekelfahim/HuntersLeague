@@ -1,7 +1,6 @@
 package com.sicario.hunters_league.domain;
 
-import com.epshiro.samurai.domain.enums.Difficulty;
-import com.epshiro.samurai.domain.enums.SpeciesType;
+
 import jakarta.persistence.*;
 import lombok.*;
 
