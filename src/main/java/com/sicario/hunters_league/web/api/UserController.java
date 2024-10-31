@@ -24,6 +24,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
+        if (userService.findByUsername(userDTO.getUsername()) != null) {
+            return ResponseEntity.badRequest().body("Username already exists");
+        }
         userService.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
@@ -31,9 +34,13 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginVm loginVm) {
         UserDTO user = userService.findByUsername(loginVm.getUsername());
-        if (user != null && passwordEncoder.matches(loginVm.getPassword(), user.getPassword())) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        }
+
+        if (passwordEncoder.matches(loginVm.getPassword(), user.getPassword())) {
             return ResponseEntity.ok("Login successful");
         }
-        return ResponseEntity.status(401).body("Invalid username or password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
     }
 }
