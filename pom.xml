@@ -6,13 +6,13 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.5</version>
-        <relativePath/>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>org.springboot</groupId>
-    <artifactId>Hunters_league</artifactId>
+    <groupId>com.sicario</groupId>
+    <artifactId>Hunters_League</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Hunters_league</name>
-    <description>Hunters_league</description>
+    <name>Hunters_League</name>
+    <description>Hunters_League</description>
     <url/>
     <licenses>
         <license/>
