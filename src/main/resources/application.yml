@@ -1,10 +1,10 @@
 spring:
 
 #  datasource:
-#    username:
-#    password:
 #    driver-class-name: org.postgresql.Driver
 #    url:
+#    username:
+#    password:
 
   jpa:
     properties:
@@ -15,11 +15,19 @@ spring:
     enabled: true
     change-log: db/changelog/master.yaml
 
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
   docker:
     compose:
-      file: src/main/docker/compose.yaml
+      file: src/main/docker/compose.yml
       enabled: true
       lifecycle-management: start_only
 
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+competition:
+  scheduleStartTime: "0 0 0 * * MON"
+
+pagination:
+  defaultPageSize: 50
+  defaultPage: 0

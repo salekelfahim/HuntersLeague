@@ -1,27 +1,20 @@
-package com.sicario.hunters_league.domain;
+package com.sicario.hunters_league.web.vm.requestVM;
 
 import com.sicario.hunters_league.domain.Enum.Difficulty;
 import com.sicario.hunters_league.domain.Enum.SpeciesType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 
-import java.util.UUID;
-
-@Entity
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Species {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class SpeciesSaveVM {
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Name cannot be blank.")
     private String name;
@@ -41,5 +34,4 @@ public class Species {
     @NotNull(message = "Points cannot be null.")
     @Positive(message = "Points must be a positive value.")
     private Integer points;
-
 }

@@ -1,4 +1,4 @@
-package com.sicario.hunters_league.domain;
+package com.sicario.hunters_league.domain.Enum;
 
 import lombok.Getter;
 

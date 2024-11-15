@@ -1,30 +1,19 @@
-package com.sicario.hunters_league.domain;
+package com.sicario.hunters_league.web.vm.requestVM;
 
 import com.sicario.hunters_league.domain.Enum.SpeciesType;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-@Entity
-@Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Competition {
-    @Id
-    @GeneratedValue
-    private UUID id;
-
-    @NotBlank(message = "Code cannot be blank.")
-    private String code;
+@Getter
+public class CompetitionSaveVM {
 
     @NotBlank(message = "Location cannot be blank.")
     private String location;
@@ -46,8 +35,4 @@ public class Competition {
 
     @NotNull(message = "Open registration status cannot be null.")
     private Boolean openRegistration;
-
-    @OneToMany(mappedBy = "competition", fetch = FetchType.LAZY)
-    private List<Participation> participations;
-
 }

@@ -1,46 +1,71 @@
 package com.sicario.hunters_league.web.api;
 
+import com.sicario.hunters_league.domain.User;
 import com.sicario.hunters_league.service.UserService;
-import com.sicario.hunters_league.service.dto.UserDTO;
-import com.sicario.hunters_league.web.vm.mapper.LoginVm;
-import org.springframework.http.HttpStatus;
+import com.sicario.hunters_league.web.vm.mapper.UserMapper;
+import com.sicario.hunters_league.web.vm.requestVM.LoginVM;
+import com.sicario.hunters_league.web.vm.requestVM.RegisterVM;
+import com.sicario.hunters_league.web.vm.requestVM.UserVM;
+import com.sicario.hunters_league.web.vm.responseVM.ProfileVM;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
-
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+    private final UserMapper userMapper;
+    public UserController(UserMapper userMapper, UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
-        if (userService.findByUsername(userDTO.getUsername()) != null) {
-            return ResponseEntity.badRequest().body("Username already exists");
-        }
-        userService.createUser(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+    public ResponseEntity<ProfileVM> register(@Valid @RequestBody RegisterVM registerVM) {
+        User user = userMapper.registerToUser(registerVM);
+        User savedUser = userService.save(user);
+        ProfileVM profileVM = userMapper.userToProfileVM(savedUser);
+        return ResponseEntity.ok(profileVM);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginVm loginVm) {
-        UserDTO user = userService.findByUsername(loginVm.getUsername());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
-        }
+    public ResponseEntity<ProfileVM> login(@Valid @RequestBody LoginVM loginVM) {
+        User loginToUser = userMapper.loginToUser(loginVM);
+        User user = userService.login(loginToUser);
+        ProfileVM profileVM = userMapper.userToProfileVM(user);
+        return ResponseEntity.ok(profileVM);
+    }
 
-        if (passwordEncoder.matches(loginVm.getPassword(), user.getPassword())) {
-            return ResponseEntity.ok("Login successful");
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+    @PutMapping("/update")
+    public ResponseEntity<UserVM> update(@Valid @RequestBody UserVM userVM) {
+        User user = userMapper.userVMToUser(userVM);
+        User updatedUser = userService.update(user);
+        UserVM updatedUserVM = userMapper.userToUserVM(updatedUser);
+        return ResponseEntity.ok(updatedUserVM);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable UUID id) {
+        userService.delete(id);
+        return ResponseEntity.ok("User deleted successfully.");
+    }
+
+    @GetMapping("/all")
+    public Page<User> findAll(@RequestParam(name = "page", required = false, defaultValue = "${pagination.defaultPage}") int page, @RequestParam(name = "size", required = false, defaultValue = "${pagination.defaultPageSize}") int size) {
+        return userService.findAll(page, size);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<User>> searchUsers(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<User> users = userService.search(username, email, page, size);
+        return ResponseEntity.ok(users);
     }
 }

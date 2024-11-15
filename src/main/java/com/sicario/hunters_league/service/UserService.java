@@ -1,36 +1,74 @@
 package com.sicario.hunters_league.service;
 
+import com.sicario.hunters_league.domain.Enum.Role;
 import com.sicario.hunters_league.domain.User;
 import com.sicario.hunters_league.repository.UserRepository;
-import com.sicario.hunters_league.service.dto.UserDTO;
-import com.sicario.hunters_league.service.dto.mapper.UserMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.sicario.hunters_league.util.PasswordHash;
+import com.sicario.hunters_league.web.error.InvalidUsernameOrPasswordException;
+import com.sicario.hunters_league.web.error.UserNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    @Autowired
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    public UserDTO createUser(UserDTO userDTO) {
-        User user = userMapper.toEntity(userDTO);
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user = userRepository.save(user);
-        return userMapper.toDTO(user);
+    public User save(User user) {
+        user.setRole(Role.MEMBER);
+        user.setJoinDate(java.time.LocalDateTime.now());
+        user.setLicenseExpirationDate(java.time.LocalDateTime.now().plusYears(2));
+        String password = PasswordHash.hashPassword(user.getPassword());
+        user.setPassword(password);
+        return userRepository.save(user);
     }
 
-    public UserDTO findByUsername(String username) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        return userOptional.map(userMapper::toDTO).orElse(null);
+    public User findById(UUID id) {
+        return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+    }
+
+    public User login(User user) {
+        return userRepository.findByUsername(user.getUsername())
+                .filter(u -> PasswordHash.checkPassword(user.getPassword(), u.getPassword()))
+                .orElseThrow(InvalidUsernameOrPasswordException::new);
+    }
+
+    public User update(User user) {
+        findById(user.getId());
+        return userRepository.save(user);
+    }
+
+    public void delete(UUID id) {
+        findById(id);
+        userRepository.deleteUser(id);
+    }
+
+    public Page<User> findAll(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("username"));
+        return userRepository.findAll(pageable);
+    }
+
+
+    public Page<User> search(String username, String email, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.search(username, email, pageable);
     }
 }
