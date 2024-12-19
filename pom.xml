@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>3.1.3</version> <!-- Use the latest stable version -->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.sicario</groupId>
-    <artifactId>Hunters_League</artifactId>
+    <groupId>org.youcode</groupId>
+    <artifactId>maska_hunters_league</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Hunters_League</name>
-    <description>Hunters_League</description>
+    <name>maska_hunters_league</name>
+    <description>maska_hunters_league</description>
     <url/>
     <licenses>
         <license/>
@@ -28,6 +28,11 @@
     </scm>
     <properties>
         <java.version>17</java.version>
+        <sonar.host.url>http://localhost:9000/</sonar.host.url>
+        <sonar.projectKey>HuntersLeague</sonar.projectKey>
+        <sonar.projectName>HuntersLeague</sonar.projectName>
+        <sonar.projectVersion>0.0.1-SNAPSHOT</sonar.projectVersion>
+        <sonar.login>sqp_2b9ee9ecd8bf927fb42310216df880025401bd42</sonar.login>
     </properties>
     <dependencies>
         <dependency>
@@ -78,6 +83,17 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>1.5.3.Final</version>
@@ -89,9 +105,33 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mindrot</groupId>
-            <artifactId>jbcrypt</artifactId>
-            <version>0.4</version>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.220</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -108,6 +148,12 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.9.1.2184</version>
             </plugin>
         </plugins>
     </build>

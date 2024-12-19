@@ -14,3 +14,6 @@ services:
 volumes:
   postgres_data:
     driver: local
+networks:
+  my_bridge_network:
+    driver: bridge
